@@ -8,22 +8,7 @@ services:
       - "8086:8086"
     env_file:
       - ./.env
-    entrypoint: ["./entrypoint.sh"]
-
-  telegraf:
-    hostname: telegraf
-    image: telegraf:1.21.4-alpine
-    user: telegraf:998
-    volumes:
-      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf
-      - /:/hostfs:ro
-      - /var/run/utmp:/hostfs/var/run/utmp:ro
-      - /run/udev:/run/udev:ro
-      - /var/run/docker.sock:/var/run/docker.sock
-    env_file:
-      - ./.env
-    depends_on:
-      - influxdb
+    entrypoint: ["./entrypoint.sh"]s
 
   grafana:
     image: grafana/grafana-enterprise:8.2.0
