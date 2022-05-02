@@ -1,0 +1,46 @@
+version: '3.9'
+services:
+  influxdb:
+    image: influxdb:2.1.1-alpine
+    volumes:
+      - influxdbv2:/var/lib/influxdb2
+    ports:
+      - "8086:8086"
+    env_file:
+      - ./.env
+    entrypoint: ["./entrypoint.sh"]
+
+  telegraf:
+    hostname: telegraf
+    image: telegraf:1.21.4-alpine
+    user: telegraf:998
+    volumes:
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf
+      - /:/hostfs:ro
+      - /var/run/utmp:/hostfs/var/run/utmp:ro
+      - /run/udev:/run/udev:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    env_file:
+      - ./.env
+    depends_on:
+      - influxdb
+
+  socketserver:
+    image: python:3.10.2-alpine3.15
+    command: python /socketserver/socket-server.py
+    depends_on:
+      - telegraf
+    ports:
+      - 10000:10000
+    volumes:
+      - ./socketserver/socket-server.py:/socketserver/socket-server.py
+      - ./data/ratings.csv:/data/ratings.csv
+
+  grafana:
+    image: grafana/grafana-enterprise:8.2.0
+    ports:
+      - 3000:3000
+    user: '104'
+
+volumes:
+  influxdbv2:
