@@ -25,17 +25,6 @@ services:
     depends_on:
       - influxdb
 
-  socketserver:
-    image: python:3.10.2-alpine3.15
-    command: python /socketserver/socket-server.py
-    depends_on:
-      - telegraf
-    ports:
-      - 10000:10000
-    volumes:
-      - ./socketserver/socket-server.py:/socketserver/socket-server.py
-      - ./data/ratings.csv:/data/ratings.csv
-
   grafana:
     image: grafana/grafana-enterprise:8.2.0
     ports:
